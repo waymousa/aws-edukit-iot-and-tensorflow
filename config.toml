@@ -4,7 +4,6 @@ languageCode = "en-US"
 defaultContentLanguage = "en"
 
 title = "AWS Edukit IoT and Tensorflow"
-theme = "learn"
 metaDataFormat = "yaml"
 defaultContentLanguageInSubdir= true
 
