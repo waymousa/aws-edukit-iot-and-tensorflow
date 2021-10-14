@@ -5,3 +5,5 @@ files:
     destination: c:\temp\static
   - source: content
     destination: c:\temp\content
+  - source: contentspec.yaml
+    destination: c:\temp\content
