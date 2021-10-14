@@ -1,8 +1,8 @@
 +++
 title = "Configure the Edukit"
 chapter = true
-weight = 4
-pre = "<b>4. </b>"
+weight = 3
+pre = "<b>3. </b>"
 +++
 
 In this section we need to set up the WiFi so that your device can connect to the internet.  
