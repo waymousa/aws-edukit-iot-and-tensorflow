@@ -3,7 +3,7 @@ frontend:
   phases:
     build:
       commands:
-        - hugo --source workshop --destination ../public --quiet
+        - hugo
   artifacts:
     baseDirectory: /public
     files:
