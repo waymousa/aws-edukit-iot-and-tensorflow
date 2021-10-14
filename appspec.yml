@@ -6,4 +6,4 @@ files:
   - source: content
     destination: c:\temp\content
   - source: contentspec.yaml
-    destination: c:\temp\content
+    destination: c:\temp
