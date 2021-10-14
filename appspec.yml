@@ -1,0 +1,7 @@
+version: 0.0
+os: windows
+files:
+  - source: static
+    destination: c:\temp\static
+  - source: content
+    destination: c:\temp\content
