@@ -22,3 +22,6 @@ pio run --environment core2foraws --target upload
 pio run --environment core2foraws --target monitor
 ```
 You should now see the serial output showing a continous stream of recordings being exampined for keywords.  Try it out by speakling clearly into the microphone on the Edukit and saying "yes" or "no".
+
+
+![AWS logo](/images/serial_output.png)
