@@ -9,7 +9,35 @@ In addition to the core2aws environment which is the base part of the project, w
 
 ## Tensorflow Micro Component
 
-In the project expoer, open the components directory.  You will see the tflite folder.  This comntains the code for Tensorflow Lite for the ESP32 platform.
+In the project expoer, open the components directory.  You will see the tflite folder.  This contains the code for Tensorflow Lite for the ESP32 platform.
+
+The tflite code is integrated to the ESP32 main method by creating a C task and main method as shown here.
+
+```
+...
+#include "tflite_main.h"
+...
+void app_main()
+{
+    ...
+    xTaskCreatePinnedToCore(&app_main_tflite, "tflite_main_task", 1024 * 32, NULL, 8, NULL, 1);
+    ...
+}
+```
+The tflite_main.cc code is actually written in C++ so this section allows it tobe called as if it were a native C function
+```
+...
+extern "C" void app_main_tflite(void) {
+  xEventGroupWaitBits(wifi_event_group, CONNECTED_BIT, false, true, portMAX_DELAY);
+  setup();
+  while (true) {
+    loop();
+  }
+}
+```
+And thats it, you can now run tasks that call the Tensorflow libraries.
+
+The main task calls the main_functions.c which is located in the tflite folder.  We will dive deep on the main_functions.c in the next section.
 
 ## Keywork Detection Model and code
 
