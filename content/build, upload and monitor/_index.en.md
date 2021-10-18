@@ -17,6 +17,10 @@ pio run --environment core2foraws
 ```
 pio run --environment core2foraws --target upload
 ```
+After the device reboots you should see the display light up with a message saying Tensorflow for a few minutes.
+
+![LCD_OUTPU](/images/edukit_running_tensorflow.png)
+
 5. Lastly, monitor the serial output from the device on your host machine.
 ```
 pio run --environment core2foraws --target monitor
