@@ -342,7 +342,9 @@ extern &quot;C&quot; void app_main_tflite(void) {
 #include &quot;tensorflow/lite/micro/micro_mutable_op_resolver.h&quot;
 #include &quot;tensorflow/lite/micro/system_setup.h&quot;
 #include &quot;tensorflow/lite/schema/schema_generated.h&quot;
-</code></pre><p>Next, we intitialise the code by setting the global namespace.  Not eht efour lines at the bottom of this section where we intitilise the memory area for the tensorflow model to run.  We also set the features to int8 because our model is expecting int8 quatised data, not 32bit floating point data which we would normally use in a tensorf;low model when resources are not constrained.</p>
+</code></pre><h3 id="intitialise">Intitialise</h3>
+<h4 id="declare-variables">Declare Variables</h4>
+<p>We intitialise the code by setting the global namespace and declaring variables.  In the code example below you can see the variables for the ErrorReporter, the model and the MicroIntepreter.  These same variavbles will be used for any TensorFlow Lite Micro applications you might develop.</p>
 <pre><code>// Globals, used for compatibility with Arduino-style sketches.
 namespace {
 tflite::ErrorReporter* error_reporter = nullptr;
@@ -352,8 +354,8 @@ TfLiteTensor* model_input = nullptr;
 FeatureProvider* feature_provider = nullptr;
 RecognizeCommands* recognizer = nullptr;
 int32_t previous_time = 0;
-
-// Create an area of memory to use for input, output, and intermediate arrays.
+</code></pre><p>The next section sets up the TensorArena.  You need to experiment with this a bit to get the memory sizing right because, whilst bigger is better, on a microcontroller you maty be wastign memory that is needed for other things.  The size of your model largely determines this value.</p>
+<pre><code>// Create an area of memory to use for input, output, and intermediate arrays.
 // The size of this will depend on the model you're using, and may need to be
 // determined by experimentation.
 constexpr int kTensorArenaSize = 10 * 1024;
@@ -361,7 +363,8 @@ uint8_t tensor_arena[kTensorArenaSize];
 int8_t feature_buffer[kFeatureElementCount];
 int8_t* model_input_buffer = nullptr;
 }  // namespace
-</code></pre><p>Next, we setup the environment with the model which we pull in from the model.cc file.  more about that later in this section</p>
+</code></pre><h4 id="load-the-model">Load the model</h4>
+<p>Next, we setup the environment with the model which we pull in from the model.cc file.  More about that later in this section.</p>
 <pre><code>// The name of this function is important for Arduino compatibility.
 void setup() {
   tflite::InitializeTarget();
@@ -382,7 +385,8 @@ void setup() {
                          model-&gt;version(), TFLITE_SCHEMA_VERSION);
     return;
   }
-</code></pre><p>To make sure our model runs effieicntly, we only need to import the Tensorflow operations that our model uses.  This reduces the memory footprint. Its important to understand the operations your model needs rather than just using the all_operations code.  See the resources section for more on how to determine this usign the python tools for Tensorflow.</p>
+</code></pre><h4 id="resolve-operators">Resolve Operators</h4>
+<p>To make sure our model runs effieicntly, we only need to import the Tensorflow operations that our model uses.  This reduces the memory footprint. Its important to understand the operations your model needs rather than just using the all_operations code.  See the resources section for more on how to determine this usign the python tools for Tensorflow.  We are using Reshape, DepthwiseConv2D, FullyConnectioned and Softmax operations in our model so thats what we set up here.</p>
 <pre><code>  //
   // tflite::AllOpsResolver resolver;
   // NOLINTNEXTLINE(runtime-global-variables)
@@ -399,19 +403,22 @@ void setup() {
   if (micro_op_resolver.AddReshape() != kTfLiteOk) {
     return;
   }
-</code></pre><p>Nedxt, we create an interpreter to run the model with</p>
+</code></pre><h4 id="intitialize-intepreter">Intitialize Intepreter</h4>
+<p>Next, we create an interpreter to run the model with, by passing in the tensor_arena, operations resolver, the model and the error reporter.</p>
 <pre><code>  // Build an interpreter to run the model with.
   static tflite::MicroInterpreter static_interpreter(
       model, micro_op_resolver, tensor_arena, kTensorArenaSize, error_reporter);
   interpreter = &amp;static_interpreter;
-
-  // Allocate memory from the tensor_arena for the model's tensors.
+</code></pre><h4 id="allocate-the-arena">Allocate the arena</h4>
+<p>Next we will allocate an area of memory that the tensors are going to run out of.</p>
+<pre><code>  // Allocate memory from the tensor_arena for the model's tensors.
   TfLiteStatus allocate_status = interpreter-&gt;AllocateTensors();
   if (allocate_status != kTfLiteOk) {
     TF_LITE_REPORT_ERROR(error_reporter, &quot;AllocateTensors() failed&quot;);
     return;
   }
-</code></pre><p>And then we set up some input buffers for the Tensors so we can feed the microphone data to the model.</p>
+</code></pre><h4 id="define-model-inputs">Define Model Inputs</h4>
+<p>And then we set up some input buffers for the Tensors so we can feed the microphone data to the model.  You mad the mode_input to the intepreter input</p>
 <pre><code>  // Get information about the memory area to use for the model's input.
   model_input = interpreter-&gt;input(0);
   if ((model_input-&gt;dims-&gt;size != 2) || (model_input-&gt;dims-&gt;data[0] != 1) ||
@@ -423,8 +430,8 @@ void setup() {
     return;
   }
   model_input_buffer = model_input-&gt;data.int8;
-
-  // Prepare to access the audio spectrograms from a microphone or other source
+</code></pre><p>Now that Tensorflow is set up, we can configure th eother applications we will need.  FeatureProvider is an app that converst the audio input to Spectograms.  RecognizeCommands is the code we use uise to do something about the commands we recognise.</p>
+<pre><code>  // Prepare to access the audio spectrograms from a microphone or other source
   // that will provide the inputs to the neural network.
   // NOLINTNEXTLINE(runtime-global-variables)
   static FeatureProvider static_feature_provider(kFeatureElementCount,
@@ -436,7 +443,15 @@ void setup() {
 
   previous_time = 0;
 }
-</code></pre><p>Last, we create a loop method that invokes takes time slices of microphone data, converst them to spectrograms, then passes the data to the Tensorflow intepreter before analysing the sample to determine is a keyword is detected.  RespondToCommands method is called to react tot he keyworks if one is found in the audio sample.</p>
+</code></pre><h4 id="setup-the-main-loop">Setup the main loop</h4>
+<p>The main loop will run 5 operations continously:</p>
+<ul>
+<li>Feature Extractor: feature_provider-&gt;PopulateFeatureData</li>
+<li>The Audio provider: GetAudioSamples (audio_provider.cc) is called in the feature provider. it is intialized as a task and runs continuosly.</li>
+<li>Intepreter: interpreter-&gt;Invoke</li>
+<li>Command Recognizer: recognizer-&gt;ProcessLatestResults</li>
+<li>Command responder: RespondToCommand</li>
+</ul>
 <pre><code>// The name of this function is important for Arduino compatibility.
 void loop() {
   // Fetch the spectrogram for the current time.
@@ -489,7 +504,7 @@ void loop() {
 </code></pre><h2 id="keywork-detection-model-and-code">Keywork Detection Model and code</h2>
 <p>I the project explorer, open the <em>includes</em> directory.</p>
 <h3 id="modelcc">model.cc</h3>
-<p>This code contains the tensorflow model that was trained in the Cloud.  The model itself is exported in CC format by the tensorflow micro python classes are the model is trained on quantised data.  This model is stored a variable <em>g_model[]</em> in the C source file.</p>
+<p>This code contains the tensorflow model that was trained in the Cloud.  The model itself is just a hexidecimal dump of the model that was trained usign Tensorflow.  This model is stored a variable <em>g_model[]</em> in the C source file.  The model itself is a TinyConv or Convolution Neural Network model that has been trained using 8bit quantised audio data.</p>
 <pre><code>#include &quot;model.h&quot;
 
 alignas(8) const unsigned char g_model[] = {

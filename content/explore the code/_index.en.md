@@ -80,6 +80,7 @@ int32_t previous_time = 0;
 
 The next section sets up the TensorArena.  You need to experiment with this a bit to get the memory sizing right because, whilst bigger is better, on a microcontroller you maty be wastign memory that is needed for other things.  The size of your model largely determines this value.
 
+```
 // Create an area of memory to use for input, output, and intermediate arrays.
 // The size of this will depend on the model you're using, and may need to be
 // determined by experimentation.
@@ -200,6 +201,13 @@ Now that Tensorflow is set up, we can configure th eother applications we will n
 ```
 
 #### Setup the main loop
+
+The main loop will run 5 operations continously:
+* Feature Extractor: feature_provider->PopulateFeatureData
+* The Audio provider: GetAudioSamples (audio_provider.cc) is called in the feature provider. it is intialized as a task and runs continuosly. 
+* Intepreter: interpreter->Invoke
+* Command Recognizer: recognizer->ProcessLatestResults
+* Command responder: RespondToCommand
 
 ```
 // The name of this function is important for Arduino compatibility.
