@@ -60,7 +60,11 @@ Firstly, we include the Tensorflow libraries.
 #include "tensorflow/lite/schema/schema_generated.h"
 ```
 
-Next, we intitialise the code by setting the global namespace.  Not eht efour lines at the bottom of this section where we intitilise the memory area for the tensorflow model to run.  We also set the features to int8 because our model is expecting int8 quatised data, not 32bit floating point data which we would normally use in a tensorf;low model when resources are not constrained.
+### Intitialise
+
+#### Declare Variables
+
+We intitialise the code by setting the global namespace and declaring variables.  In the code example below you can see the variables for the ErrorReporter, the model and the MicroIntepreter.  These same variavbles will be used for any TensorFlow Lite Micro applications you might develop.
 
 ```
 // Globals, used for compatibility with Arduino-style sketches.
@@ -72,6 +76,9 @@ TfLiteTensor* model_input = nullptr;
 FeatureProvider* feature_provider = nullptr;
 RecognizeCommands* recognizer = nullptr;
 int32_t previous_time = 0;
+```
+
+The next section sets up the TensorArena.  You need to experiment with this a bit to get the memory sizing right because, whilst bigger is better, on a microcontroller you maty be wastign memory that is needed for other things.  The size of your model largely determines this value.
 
 // Create an area of memory to use for input, output, and intermediate arrays.
 // The size of this will depend on the model you're using, and may need to be
@@ -83,7 +90,9 @@ int8_t* model_input_buffer = nullptr;
 }  // namespace
 ```
 
-Next, we setup the environment with the model which we pull in from the model.cc file.  more about that later in this section
+#### Load the model
+
+Next, we setup the environment with the model which we pull in from the model.cc file.  More about that later in this section.
 
 ```
 // The name of this function is important for Arduino compatibility.
@@ -108,7 +117,9 @@ void setup() {
   }
 ```
 
-To make sure our model runs effieicntly, we only need to import the Tensorflow operations that our model uses.  This reduces the memory footprint. Its important to understand the operations your model needs rather than just using the all_operations code.  See the resources section for more on how to determine this usign the python tools for Tensorflow. 
+#### Resolve Operators
+
+To make sure our model runs effieicntly, we only need to import the Tensorflow operations that our model uses.  This reduces the memory footprint. Its important to understand the operations your model needs rather than just using the all_operations code.  See the resources section for more on how to determine this usign the python tools for Tensorflow.  We are using Reshape, DepthwiseConv2D, FullyConnectioned and Softmax operations in our model so thats what we set up here.
 
 ```
   //
@@ -129,14 +140,22 @@ To make sure our model runs effieicntly, we only need to import the Tensorflow o
   }
 ```
 
-Nedxt, we create an interpreter to run the model with
+#### Intitialize Intepreter
+
+Next, we create an interpreter to run the model with, by passing in the tensor_arena, operations resolver, the model and the error reporter.
 
 ```
   // Build an interpreter to run the model with.
   static tflite::MicroInterpreter static_interpreter(
       model, micro_op_resolver, tensor_arena, kTensorArenaSize, error_reporter);
   interpreter = &static_interpreter;
+```
 
+#### Allocate the arena
+
+Next we will allocate an area of memory that the tensors are going to run out of.
+
+```
   // Allocate memory from the tensor_arena for the model's tensors.
   TfLiteStatus allocate_status = interpreter->AllocateTensors();
   if (allocate_status != kTfLiteOk) {
@@ -145,7 +164,9 @@ Nedxt, we create an interpreter to run the model with
   }
 ```
 
-And then we set up some input buffers for the Tensors so we can feed the microphone data to the model.
+#### Define Model Inputs
+
+And then we set up some input buffers for the Tensors so we can feed the microphone data to the model.  You mad the mode_input to the intepreter input 
 
 ```
   // Get information about the memory area to use for the model's input.
@@ -159,7 +180,11 @@ And then we set up some input buffers for the Tensors so we can feed the microph
     return;
   }
   model_input_buffer = model_input->data.int8;
+```
 
+Now that Tensorflow is set up, we can configure th eother applications we will need.  FeatureProvider is an app that converst the audio input to Spectograms.  RecognizeCommands is the code we use uise to do something about the commands we recognise.
+
+```
   // Prepare to access the audio spectrograms from a microphone or other source
   // that will provide the inputs to the neural network.
   // NOLINTNEXTLINE(runtime-global-variables)
@@ -174,7 +199,7 @@ And then we set up some input buffers for the Tensors so we can feed the microph
 }
 ```
 
-Last, we create a loop method that invokes takes time slices of microphone data, converst them to spectrograms, then passes the data to the Tensorflow intepreter before analysing the sample to determine is a keyword is detected.  RespondToCommands method is called to react tot he keyworks if one is found in the audio sample.
+#### Setup the main loop
 
 ```
 // The name of this function is important for Arduino compatibility.
@@ -234,7 +259,7 @@ I the project explorer, open the *includes* directory.
 
 ### model.cc
 
-This code contains the tensorflow model that was trained in the Cloud.  The model itself is exported in CC format by the tensorflow micro python classes are the model is trained on quantised data.  This model is stored a variable *g_model[]* in the C source file.
+This code contains the tensorflow model that was trained in the Cloud.  The model itself is just a hexidecimal dump of the model that was trained usign Tensorflow.  This model is stored a variable *g_model[]* in the C source file.  The model itself is a TinyConv or Convolution Neural Network model that has been trained using 8bit quantised audio data.
 
 ```
 #include "model.h"

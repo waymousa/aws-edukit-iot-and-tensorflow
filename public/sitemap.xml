@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>/getting-started.html</loc>
+  </url><url>
+    <loc>/clone-the-project.html</loc>
+  </url><url>
+    <loc>/configure-the-edukit.html</loc>
+  </url><url>
+    <loc>/explore-the-code.html</loc>
+  </url><url>
+    <loc>/build-upload-and-monitor.html</loc>
+  </url><url>
+    <loc>/customize-your-code.html</loc>
+  </url><url>
+    <loc>/next-steps.html</loc>
+  </url><url>
+    <loc>/</loc>
+  </url><url>
+    <loc>/categories.html</loc>
+  </url><url>
+    <loc>/tags.html</loc>
+  </url>
+</urlset>

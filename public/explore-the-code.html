@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en-US" prefix="og: https://ogp.me/ns# fb: https://ogp.me/ns/fb#">
+<html lang="en" class="js csstransforms3d">
+<head>
+  <meta charset="utf-8">
+  <meta property="og:title" content="AWS Edukit IoT and Tensorflow" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="generator" content="Hugo 0.83.1" />
+  <meta name="description" content="This workshop module will take you through the steps required to deploy and test a Tensorflow model on the AWS EduKit IoT device.">
+<meta name="author" content="Amazon AWS">
+
+  <link rel="shortcut icon" href="https://a0.awsstatic.com/libra-css/images/site/fav/favicon.ico" type="image/ico" />
+<link rel="icon" href="https://a0.awsstatic.com/libra-css/images/site/fav/favicon.ico" type="image/ico" />
+
+  <title>Explore the code :: AWS Edukit IoT and Tensorflow</title>
+
+  
+  <link href="./css/nucleus.css" rel="stylesheet">
+  <link href="./css/fontawesome-all.min.css" rel="stylesheet">
+  <link href="./css/hybrid.css" rel="stylesheet">
+  <link href="./css/featherlight.min.css" rel="stylesheet">
+  <link href="./css/perfect-scrollbar.min.css" rel="stylesheet">
+  <link href="./css/auto-complete.css" rel="stylesheet">
+  <link href="./css/atom-one-dark-reasonable.css" rel="stylesheet">
+  <link href="./css/theme.css" rel="stylesheet">
+  <link href="./css/hugo-theme.css" rel="stylesheet">
+  
+  <link href="./css/theme-aws.css" rel="stylesheet">
+  
+
+  <script src="./js/jquery-3.5.1.min.js"></script>
+
+  <style>
+    :root #header + #content > #left > #rlblock_left{
+        display:none !important;
+    }
+    
+      :not(pre) > code + span.copy-to-clipboard {
+          display: none;
+      }
+    
+  </style>
+  
+</head>
+
+<body class="" data-url="./explore-the-code.html">
+  <nav id="sidebar" class="">
+
+
+
+  <div id="header-wrapper">
+    <div id="header">
+      <div>
+    <a href="./" title="Go home">
+        <img style="vertical-align:middle" src="https://fonts.workshops.aws/logos/logo.png" height="70px" />
+    </a>
+</div>
+
+    </div>
+    
+        <div class="searchbox">
+    <label for="search-by"><i class="fas fa-search"></i></label>
+    <input data-search-input id="search-by" type="search" placeholder="Search...">
+    <span data-search-clear=""><i class="fas fa-times"></i></span>
+</div>
+
+<script type="text/javascript" src="./js/lunr.min.js"></script>
+<script type="text/javascript" src="./js/auto-complete.js"></script>
+<script type="text/javascript">
+    
+        var baseurl = "";
+    
+</script>
+<script type="text/javascript" src="./js/search.js"></script>
+
+    
+  </div>
+
+    <div class="highlightable">
+    <ul class="topics">
+
+        
+          
+          
+
+
+ 
+  
+    
+    <li data-nav-id="/getting-started.html" title="Getting started" class="dd-item 
+        
+        
+        
+        ">
+      <a href="./getting-started.html">
+          <b>1. </b>Getting started
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+          
+          
+
+
+ 
+  
+    
+    <li data-nav-id="/clone-the-project.html" title="Clone the project" class="dd-item 
+        
+        
+        
+        ">
+      <a href="./clone-the-project.html">
+          <b>2. </b>Clone the project
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+          
+          
+
+
+ 
+  
+    
+    <li data-nav-id="/configure-the-edukit.html" title="Configure the Edukit" class="dd-item 
+        
+        
+        
+        ">
+      <a href="./configure-the-edukit.html">
+          <b>3. </b>Configure the Edukit
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+          
+          
+
+
+ 
+  
+    
+    <li data-nav-id="/explore-the-code.html" title="Explore the code" class="dd-item 
+        parent
+        active
+        
+        ">
+      <a href="./explore-the-code.html">
+          <b>4. </b>Explore the code
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+          
+          
+
+
+ 
+  
+    
+    <li data-nav-id="/build-upload-and-monitor.html" title="Build, upload and monitor" class="dd-item 
+        
+        
+        
+        ">
+      <a href="./build-upload-and-monitor.html">
+          <b>5. </b>Build, upload and monitor
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+          
+          
+
+
+ 
+  
+    
+    <li data-nav-id="/customize-your-code.html" title="Customize the code" class="dd-item 
+        
+        
+        
+        ">
+      <a href="./customize-your-code.html">
+          <b>6. </b>Customize the code
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+          
+          
+
+
+ 
+  
+    
+    <li data-nav-id="/next-steps.html" title="Next Steps" class="dd-item 
+        
+        
+        
+        ">
+      <a href="./next-steps.html">
+          <b>99. </b>Next Steps
+          
+      </a>
+      
+              
+    </li>
+  
+ 
+
+          
+         
+    </ul>
+
+    
+    
+
+    
+    <section id="footer">
+      <left>
+
+    <a href="https://aws.amazon.com/privacy/?nc1=f_pr">Privacy</a> | <a href="https://aws.amazon.com/terms/?nc1=f_pr">Site Terms</a> | © 2021, Amazon Web Services, Inc. or its affiliates. All rights reserved. 
+
+</left>
+
+    </section>
+  </div>
+</nav>
+
+
+
+
+
+  <section id="body">
+    <div id="overlay"></div>
+    <div class="padding highlightable">
+      
+      <div>
+        <div id="top-bar">
+          
+          
+          <div id="breadcrumbs" itemscope="" itemtype="https://data-vocabulary.org/Breadcrumb">
+            <span id="sidebar-toggle-span">
+              <a href="#" id="sidebar-toggle" data-sidebar-toggle="">
+                <i class="fa fa-bars"></i>
+              </a>
+            </span>
+            
+            <span class="links">
+              
+          
+          
+          
+          
+          
+          
+          <a href='./'>AWS Edukit IoT and Tensorflow</a> > Explore the code
+          
+          
+          
+          
+            </span>
+          </div>
+          
+        </div>
+      </div>
+      
+
+      
+      <div id="chapter">
+        
+        <div id="body-inner">
+          <h1>Explore the code</h1>
+          
+          
+
+
+	<p>In addition to the core2aws environment which is the base part of the project, we have added some new components and included some code to support TensorFlow lite micro on the Edukit.</p>
+<h2 id="tensorflow-micro-component">Tensorflow Micro Component</h2>
+<p>In the project expoer, open the components directory.  You will see the tflite folder.  This contains the code for Tensorflow Lite for the ESP32 platform.</p>
+<p>The tflite code is integrated to the ESP32 main method by creating a C task and main method as shown here.</p>
+<pre><code>...
+#include &quot;tflite_main.h&quot;
+...
+void app_main()
+{
+    ...
+    xTaskCreatePinnedToCore(&amp;app_main_tflite, &quot;tflite_main_task&quot;, 1024 * 32, NULL, 8, NULL, 1);
+    ...
+}
+</code></pre><p>The tflite_main.cc code is actually written in C++ so this section allows it tobe called as if it were a native C function</p>
+<pre><code>...
+extern &quot;C&quot; void app_main_tflite(void) {
+  xEventGroupWaitBits(wifi_event_group, CONNECTED_BIT, false, true, portMAX_DELAY);
+  setup();
+  while (true) {
+    loop();
+  }
+}
+</code></pre><p>And thats it, you can now run tasks that call the Tensorflow libraries.</p>
+<p>The main task calls the <em>main_functions.c</em> which is located in the tflite folder.  We will dive deep on the <em>main_functions.c</em> in the next section.</p>
+<h2 id="main-functions">Main functions</h2>
+<p>The main_functions.c file contains multiple sections you will need to become familiar with.  For those of you who are familiar with Arduino platform this will look very similar.</p>
+<p>Firstly, we include the Tensorflow libraries.</p>
+<pre><code>#include &quot;main_functions.h&quot;
+
+#include &quot;audio_provider.h&quot;
+#include &quot;command_responder.h&quot;
+#include &quot;feature_provider.h&quot;
+#include &quot;model.h&quot;
+#include &quot;recognize_commands.h&quot;
+#include &quot;tensorflow/lite/micro/micro_error_reporter.h&quot;
+#include &quot;tensorflow/lite/micro/micro_interpreter.h&quot;
+#include &quot;tensorflow/lite/micro/micro_mutable_op_resolver.h&quot;
+#include &quot;tensorflow/lite/micro/system_setup.h&quot;
+#include &quot;tensorflow/lite/schema/schema_generated.h&quot;
+</code></pre><p>Next, we intitialise the code by setting the global namespace.  Not eht efour lines at the bottom of this section where we intitilise the memory area for the tensorflow model to run.  We also set the features to int8 because our model is expecting int8 quatised data, not 32bit floating point data which we would normally use in a tensorf;low model when resources are not constrained.</p>
+<pre><code>// Globals, used for compatibility with Arduino-style sketches.
+namespace {
+tflite::ErrorReporter* error_reporter = nullptr;
+const tflite::Model* model = nullptr;
+tflite::MicroInterpreter* interpreter = nullptr;
+TfLiteTensor* model_input = nullptr;
+FeatureProvider* feature_provider = nullptr;
+RecognizeCommands* recognizer = nullptr;
+int32_t previous_time = 0;
+
+// Create an area of memory to use for input, output, and intermediate arrays.
+// The size of this will depend on the model you're using, and may need to be
+// determined by experimentation.
+constexpr int kTensorArenaSize = 10 * 1024;
+uint8_t tensor_arena[kTensorArenaSize];
+int8_t feature_buffer[kFeatureElementCount];
+int8_t* model_input_buffer = nullptr;
+}  // namespace
+</code></pre><p>Next, we setup the environment with the model which we pull in from the model.cc file.  more about that later in this section</p>
+<pre><code>// The name of this function is important for Arduino compatibility.
+void setup() {
+  tflite::InitializeTarget();
+
+  // Set up logging. Google style is to avoid globals or statics because of
+  // lifetime uncertainty, but since this has a trivial destructor it's okay.
+  // NOLINTNEXTLINE(runtime-global-variables)
+  static tflite::MicroErrorReporter micro_error_reporter;
+  error_reporter = &amp;micro_error_reporter;
+
+  // Map the model into a usable data structure. This doesn't involve any
+  // copying or parsing, it's a very lightweight operation.
+  model = tflite::GetModel(g_model);
+  if (model-&gt;version() != TFLITE_SCHEMA_VERSION) {
+    TF_LITE_REPORT_ERROR(error_reporter,
+                         &quot;Model provided is schema version %d not equal &quot;
+                         &quot;to supported version %d.&quot;,
+                         model-&gt;version(), TFLITE_SCHEMA_VERSION);
+    return;
+  }
+</code></pre><p>To make sure our model runs effieicntly, we only need to import the Tensorflow operations that our model uses.  This reduces the memory footprint. Its important to understand the operations your model needs rather than just using the all_operations code.  See the resources section for more on how to determine this usign the python tools for Tensorflow.</p>
+<pre><code>  //
+  // tflite::AllOpsResolver resolver;
+  // NOLINTNEXTLINE(runtime-global-variables)
+  static tflite::MicroMutableOpResolver&lt;4&gt; micro_op_resolver(error_reporter);
+  if (micro_op_resolver.AddDepthwiseConv2D() != kTfLiteOk) {
+    return;
+  }
+  if (micro_op_resolver.AddFullyConnected() != kTfLiteOk) {
+    return;
+  }
+  if (micro_op_resolver.AddSoftmax() != kTfLiteOk) {
+    return;
+  }
+  if (micro_op_resolver.AddReshape() != kTfLiteOk) {
+    return;
+  }
+</code></pre><p>Nedxt, we create an interpreter to run the model with</p>
+<pre><code>  // Build an interpreter to run the model with.
+  static tflite::MicroInterpreter static_interpreter(
+      model, micro_op_resolver, tensor_arena, kTensorArenaSize, error_reporter);
+  interpreter = &amp;static_interpreter;
+
+  // Allocate memory from the tensor_arena for the model's tensors.
+  TfLiteStatus allocate_status = interpreter-&gt;AllocateTensors();
+  if (allocate_status != kTfLiteOk) {
+    TF_LITE_REPORT_ERROR(error_reporter, &quot;AllocateTensors() failed&quot;);
+    return;
+  }
+</code></pre><p>And then we set up some input buffers for the Tensors so we can feed the microphone data to the model.</p>
+<pre><code>  // Get information about the memory area to use for the model's input.
+  model_input = interpreter-&gt;input(0);
+  if ((model_input-&gt;dims-&gt;size != 2) || (model_input-&gt;dims-&gt;data[0] != 1) ||
+      (model_input-&gt;dims-&gt;data[1] !=
+       (kFeatureSliceCount * kFeatureSliceSize)) ||
+      (model_input-&gt;type != kTfLiteInt8)) {
+    TF_LITE_REPORT_ERROR(error_reporter,
+                         &quot;Bad input tensor parameters in model&quot;);
+    return;
+  }
+  model_input_buffer = model_input-&gt;data.int8;
+
+  // Prepare to access the audio spectrograms from a microphone or other source
+  // that will provide the inputs to the neural network.
+  // NOLINTNEXTLINE(runtime-global-variables)
+  static FeatureProvider static_feature_provider(kFeatureElementCount,
+                                                 feature_buffer);
+  feature_provider = &amp;static_feature_provider;
+
+  static RecognizeCommands static_recognizer(error_reporter);
+  recognizer = &amp;static_recognizer;
+
+  previous_time = 0;
+}
+</code></pre><p>Last, we create a loop method that invokes takes time slices of microphone data, converst them to spectrograms, then passes the data to the Tensorflow intepreter before analysing the sample to determine is a keyword is detected.  RespondToCommands method is called to react tot he keyworks if one is found in the audio sample.</p>
+<pre><code>// The name of this function is important for Arduino compatibility.
+void loop() {
+  // Fetch the spectrogram for the current time.
+  const int32_t current_time = LatestAudioTimestamp();
+  int how_many_new_slices = 0;
+  TfLiteStatus feature_status = feature_provider-&gt;PopulateFeatureData(
+      error_reporter, previous_time, current_time, &amp;how_many_new_slices);
+  if (feature_status != kTfLiteOk) {
+    TF_LITE_REPORT_ERROR(error_reporter, &quot;Feature generation failed&quot;);
+    return;
+  }
+  previous_time = current_time;
+  // If no new audio samples have been received since last time, don't bother
+  // running the network model.
+  if (how_many_new_slices == 0) {
+    return;
+  }
+
+  // Copy feature buffer to input tensor
+  for (int i = 0; i &lt; kFeatureElementCount; i++) {
+    model_input_buffer[i] = feature_buffer[i];
+  }
+
+  // Run the model on the spectrogram input and make sure it succeeds.
+  TfLiteStatus invoke_status = interpreter-&gt;Invoke();
+  if (invoke_status != kTfLiteOk) {
+    TF_LITE_REPORT_ERROR(error_reporter, &quot;Invoke failed&quot;);
+    return;
+  }
+
+  // Obtain a pointer to the output tensor
+  TfLiteTensor* output = interpreter-&gt;output(0);
+  // Determine whether a command was recognized based on the output of inference
+  const char* found_command = nullptr;
+  uint8_t score = 0;
+  bool is_new_command = false;
+  TfLiteStatus process_status = recognizer-&gt;ProcessLatestResults(
+      output, current_time, &amp;found_command, &amp;score, &amp;is_new_command);
+  if (process_status != kTfLiteOk) {
+    TF_LITE_REPORT_ERROR(error_reporter,
+                         &quot;RecognizeCommands::ProcessLatestResults() failed&quot;);
+    return;
+  }
+  // Do something based on the recognized command. The default implementation
+  // just prints to the error console, but you should replace this with your
+  // own function for a real application.
+  RespondToCommand(error_reporter, current_time, found_command, score,
+                   is_new_command);
+}
+</code></pre><h2 id="keywork-detection-model-and-code">Keywork Detection Model and code</h2>
+<p>I the project explorer, open the <em>includes</em> directory.</p>
+<h3 id="modelcc">model.cc</h3>
+<p>This code contains the tensorflow model that was trained in the Cloud.  The model itself is exported in CC format by the tensorflow micro python classes are the model is trained on quantised data.  This model is stored a variable <em>g_model[]</em> in the C source file.</p>
+<pre><code>#include &quot;model.h&quot;
+
+alignas(8) const unsigned char g_model[] = {
+  0x20, 0x00, 0x00, 0x00, 0x54, 0x46, 0x4c, 0x33, 0x00, 0x00, 0x00, 0x00,
+  0x00, 0x00, 0x12, 0x00, 0x1c, 0x00, 0x04, 0x00, 0x08, 0x00, 0x0c, 0x00,
+  0x10, 0x00, 0x14, 0x00, 0x00, 0x00, 0x18, 0x00, 0x12, 0x00, 0x00, 0x00,
+...
+  0x03, 0x00, 0x00, 0x00
+};
+unsigned int micro_speech_tflite_len = 18712;
+</code></pre><p>Note the len variable at the bottom of the file.  You will need to update this when you train your own models with the size of the C variable so that the microcopntroller can allocate the right amount of memory for it.  Yes!  you need to worry about memory usage now because your dealing with a microcontroller and space is finite :-)</p>
+<p>In here you will see the supporting code from the Tensorflow project that allows the Edukit enable the microphone, write microphone data to a ringbuffer, read the buffer and convert the audio to a spectogram, run inferences using the Tensroflow model, confirm if a command was detected and respond to that command.</p>
+<h2 id="tying-it-all-together">Tying it all together</h2>
+<p>Now that you have seen the code layout in the project, you can tie it all together by running the tflite task in the main.c for the application.</p>
+
+
+
+
+
+<footer class=" footline" >
+	
+</footer>
+
+        
+            </div> 
+        
+        </div>
+        
+
+      </div>
+
+    <div id="navigation">
+        
+        
+
+        
+            
+            
+                
+                    
+                    
+                
+                
+
+                    
+                    
+                        
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                        
+                        
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                        
+                        
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+            
+        
+
+        
+
+
+	 
+	 
+		
+			<a class="nav nav-prev" href="./configure-the-edukit.html" title="Configure the Edukit"> <i class="fa fa-chevron-left"></i></a>
+		
+		
+			<a class="nav nav-next" href="./build-upload-and-monitor.html" title="Build, upload and monitor" style="margin-right: 0px;"><i class="fa fa-chevron-right"></i></a>
+		
+	
+    </div>
+
+    </section>
+
+    <div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;">
+      <div style="border: none; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div>
+    </div>
+    <script src="./js/clipboard.min.js"></script>
+    <script src="./js/perfect-scrollbar.min.js"></script>
+    <script src="./js/perfect-scrollbar.jquery.min.js"></script>
+    <script src="./js/jquery.sticky.js"></script>
+    <script src="./js/featherlight.min.js"></script>
+    <script src="./js/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+    <script src="./js/modernizr.custom-3.6.0.js"></script>
+    <script src="./js/learn.js"></script>
+    <script src="./js/hugo-learn.js"></script>
+    
+        
+            <script src="./mermaid/mermaid.js"></script>
+        
+        <script>
+            mermaid.initialize({ startOnLoad: true });
+        </script>
+    
+    
+  </body>
+</html>
