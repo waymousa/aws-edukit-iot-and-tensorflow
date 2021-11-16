@@ -14,3 +14,8 @@ Paste `https://github.com/waymousa/TFLite_Voice_Commands.git` into the text fiel
 ![AWS logo](/static/pio-clone_git_project.en.png)
 
 1 - Open PIO menu, 2 - Clone git project, 3 - Paste repository URL 
+
+You will be asked to select a folder where you would like to store the repo.  Pick a location on your local disk and click on the Select Respository Location button.
+
+![AWS logo](/static/pio_select_folder.png.en.png)
+
