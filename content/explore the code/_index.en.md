@@ -39,7 +39,9 @@ And thats it, you can now run tasks that call the Tensorflow libraries.
 
 The main task calls the *main_functions.c* which is located in the tflite folder.  We will dive deep on the *main_functions.c* in the next section.
 
-## Main functions
+In the project explorer, open the *main/tflite* directory. 
+
+## main_functions.cc
 
 The main_functions.c file contains multiple sections you will need to become familiar with.  For those of you who are familiar with Arduino platform this will look very similar.
 
@@ -200,7 +202,7 @@ Now that Tensorflow is set up, we can configure th eother applications we will n
 }
 ```
 
-#### Setup the main loop
+### Setup the main loop
 
 The main loop will run 5 operations continously:
 * Feature Extractor: feature_provider->PopulateFeatureData
@@ -261,9 +263,7 @@ void loop() {
 }
 ```
 
-## Keywork Detection Model and code
-
-I the project explorer, open the *includes* directory.  
+## Supporting code
 
 ### model.cc
 
@@ -282,11 +282,15 @@ alignas(8) const unsigned char g_model[] = {
 unsigned int micro_speech_tflite_len = 18712;
 ```
 
-
-
 Note the len variable at the bottom of the file.  You will need to update this when you train your own models with the size of the C variable so that the microcopntroller can allocate the right amount of memory for it.  Yes!  you need to worry about memory usage now because your dealing with a microcontroller and space is finite :-)
 
+### audio_provider.cc
 
+This file sets up the i2s audio for the Edukit.  It is one of the files that you will have to modify if you want to port this project to other hardware devices.  The code intitilaizes the audio system and creates a ringbugffer where it will store the auid samples.  Recording is started as a freertos xTaskCreate step and runs contonousely.  As the audio is read by calling GetAudioSamples from the feature provider.  The audio is then pulled off the ringbuffer so that is doesn't fill up.
+
+### feature_provider.cc
+
+This slices the audio up and 
 
 In here you will see the supporting code from the Tensorflow project that allows the Edukit enable the microphone, write microphone data to a ringbuffer, read the buffer and convert the audio to a spectogram, run inferences using the Tensroflow model, confirm if a command was detected and respond to that command.
 
