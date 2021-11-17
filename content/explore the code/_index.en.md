@@ -290,10 +290,18 @@ This file sets up the i2s audio for the Edukit.  It is one of the files that you
 
 ### feature_provider.cc
 
-This slices the audio up and 
+This creates a shifting wiondo of time slices to use to process the audion samples when looking for features.  This deals with the problem where the audio sample is split across different audio files in the ring buffer.  The feature provider then calls the GetAudioSamples method from the audio_provider.cc which pulls audio samples off the ring buffer that match the slice window that the model requires.  The shifting window approach also means that we avoid reprocessing audio samples that have already been converted to Spectograms for the purposes of inference.  The code them moves on to GenerateMicroFeatures where it will convert the audio to Spectograms.
 
-In here you will see the supporting code from the Tensorflow project that allows the Edukit enable the microphone, write microphone data to a ringbuffer, read the buffer and convert the audio to a spectogram, run inferences using the Tensroflow model, confirm if a command was detected and respond to that command.
+### recognize_commands.cc
 
-## Tying it all together
+This code processes the data from the output tensor which will contain results for the entire time window, then makes some calculations based on the output values of the inference to determine if there was a high enough probability that a comand was detected by the model.  If not output scores are high enough then the category will be unknown.  Else, the top category is output, in this case "yes" or "no".
 
-Now that you have seen the code layout in the project, you can tie it all together by running the tflite task in the main.c for the application.
+### command_responder.cc
+
+This code is where you decide what you want to actuate with the microcontroler when a keyword is detected.  The project starts with output to the concole in PlatformIO, but we want this to work in the field where the device is located so in the next steps we will update out code to:
+
+* Output to the LCD display on the device
+* Blink the RED LED when it detects the keyword NO
+* Blink the GREEN LED when it detects the keyword YES
+
+Based on the features of your controller you may want to use it to respond to commands by turning power on or off, sending a message via MQTT, uploading "unknown" data to the cloud so that it can be classified and used to improve your model with more data models.
