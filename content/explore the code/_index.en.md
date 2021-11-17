@@ -7,9 +7,19 @@ pre = "<b>4. </b>"
 
 In addition to the core2aws environment which is the base part of the project, we have added some new components and included some code to support TensorFlow lite micro on the Edukit.  
 
-## Tensorflow Micro Component
+## Tensorflow Micro Components
 
-In the project expoer, open the components directory.  You will see the tflite folder.  This contains the code for Tensorflow Lite for the ESP32 platform.
+To add the Tensroflow libraries and supporting code to the project we have included the following folders.  Take a moment to explore these using the PlatformIO folder expolrer now.
+
+#### components\tfmicro
+
+This is the library that supports Tensorflow ont he ESP32 playtform.  You can create this library for importing to your project by viewing the instructions at this blog post [Tensorflow on ESP32](https://blog.tensorflow.org/2020/08/announcing-tensorflow-lite-micro-esp32.html).  
+
+#### main\tflite
+
+This is the code that supports the micro_speech sample program.  It includes a model that has been trained with some extra data to categorise keywords "yes" and "no".  There are also source files that we will discuss later in this walkthrough for processing audio samples into Spectograms, running inference uing the model and the Tensorflow Interpreter, and actuating the controller after a keyword is detected.
+
+#### main\main.c
 
 The tflite code is integrated to the ESP32 main method by creating a C task and main method as shown here.
 
@@ -24,7 +34,11 @@ void app_main()
     ...
 }
 ```
+
+#### main\tflite_main.cc
+
 The tflite_main.cc code is actually written in C++ so this section allows it tobe called as if it were a native C function
+
 ```
 ...
 extern "C" void app_main_tflite(void) {
@@ -35,13 +49,14 @@ extern "C" void app_main_tflite(void) {
   }
 }
 ```
+
 And thats it, you can now run tasks that call the Tensorflow libraries.
 
 The main task calls the *main_functions.c* which is located in the tflite folder.  We will dive deep on the *main_functions.c* in the next section.
 
 In the project explorer, open the *main/tflite* directory. 
 
-## main_functions.cc
+## main\tflite\main_functions.cc
 
 The main_functions.c file contains multiple sections you will need to become familiar with.  For those of you who are familiar with Arduino platform this will look very similar.
 
@@ -62,9 +77,9 @@ Firstly, we include the Tensorflow libraries.
 #include "tensorflow/lite/schema/schema_generated.h"
 ```
 
-### Intitialise
+#### Intitialise
 
-#### Declare Variables
+##### Declare Variables
 
 We intitialise the code by setting the global namespace and declaring variables.  In the code example below you can see the variables for the ErrorReporter, the model and the MicroIntepreter.  These same variavbles will be used for any TensorFlow Lite Micro applications you might develop.
 
@@ -93,7 +108,7 @@ int8_t* model_input_buffer = nullptr;
 }  // namespace
 ```
 
-#### Load the model
+##### Load the model
 
 Next, we setup the environment with the model which we pull in from the model.cc file.  More about that later in this section.
 
@@ -120,7 +135,7 @@ void setup() {
   }
 ```
 
-#### Resolve Operators
+##### Resolve Operators
 
 To make sure our model runs effieicntly, we only need to import the Tensorflow operations that our model uses.  This reduces the memory footprint. Its important to understand the operations your model needs rather than just using the all_operations code.  See the resources section for more on how to determine this usign the python tools for Tensorflow.  We are using Reshape, DepthwiseConv2D, FullyConnectioned and Softmax operations in our model so thats what we set up here.
 
@@ -143,7 +158,7 @@ To make sure our model runs effieicntly, we only need to import the Tensorflow o
   }
 ```
 
-#### Intitialize Intepreter
+##### Intitialize Intepreter
 
 Next, we create an interpreter to run the model with, by passing in the tensor_arena, operations resolver, the model and the error reporter.
 
@@ -154,7 +169,7 @@ Next, we create an interpreter to run the model with, by passing in the tensor_a
   interpreter = &static_interpreter;
 ```
 
-#### Allocate the arena
+##### Allocate the arena
 
 Next we will allocate an area of memory that the tensors are going to run out of.
 
@@ -167,7 +182,7 @@ Next we will allocate an area of memory that the tensors are going to run out of
   }
 ```
 
-#### Define Model Inputs
+##### Define Model Inputs
 
 And then we set up some input buffers for the Tensors so we can feed the microphone data to the model.  You mad the mode_input to the intepreter input 
 
@@ -202,7 +217,7 @@ Now that Tensorflow is set up, we can configure th eother applications we will n
 }
 ```
 
-### Setup the main loop
+#### Setup the main loop
 
 The main loop will run 5 operations continously:
 * Feature Extractor: feature_provider->PopulateFeatureData
@@ -265,7 +280,7 @@ void loop() {
 
 ## Supporting code
 
-### model.cc
+#### main\tflite\model.cc
 
 This code contains the tensorflow model that was trained in the Cloud.  The model itself is just a hexidecimal dump of the model that was trained usign Tensorflow.  This model is stored a variable *g_model[]* in the C source file.  The model itself is a TinyConv or Convolution Neural Network model that has been trained using 8bit quantised audio data.
 
@@ -284,19 +299,19 @@ unsigned int micro_speech_tflite_len = 18712;
 
 Note the len variable at the bottom of the file.  You will need to update this when you train your own models with the size of the C variable so that the microcopntroller can allocate the right amount of memory for it.  Yes!  you need to worry about memory usage now because your dealing with a microcontroller and space is finite :-)
 
-### audio_provider.cc
+#### main\tflite\audio_provider.cc
 
 This file sets up the i2s audio for the Edukit.  It is one of the files that you will have to modify if you want to port this project to other hardware devices.  The code intitilaizes the audio system and creates a ringbugffer where it will store the auid samples.  Recording is started as a freertos xTaskCreate step and runs contonousely.  As the audio is read by calling GetAudioSamples from the feature provider.  The audio is then pulled off the ringbuffer so that is doesn't fill up.
 
-### feature_provider.cc
+#### main\tflite\feature_provider.cc
 
 This creates a shifting wiondo of time slices to use to process the audion samples when looking for features.  This deals with the problem where the audio sample is split across different audio files in the ring buffer.  The feature provider then calls the GetAudioSamples method from the audio_provider.cc which pulls audio samples off the ring buffer that match the slice window that the model requires.  The shifting window approach also means that we avoid reprocessing audio samples that have already been converted to Spectograms for the purposes of inference.  The code them moves on to GenerateMicroFeatures where it will convert the audio to Spectograms.
 
-### recognize_commands.cc
+#### main\tflite\recognize_commands.cc
 
 This code processes the data from the output tensor which will contain results for the entire time window, then makes some calculations based on the output values of the inference to determine if there was a high enough probability that a comand was detected by the model.  If not output scores are high enough then the category will be unknown.  Else, the top category is output, in this case "yes" or "no".
 
-### command_responder.cc
+#### main\tflite\command_responder.cc
 
 This code is where you decide what you want to actuate with the microcontroler when a keyword is detected.  The project starts with output to the concole in PlatformIO, but we want this to work in the field where the device is located so in the next steps we will update out code to:
 
